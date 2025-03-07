@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -82,9 +83,9 @@ WSGI_APPLICATION = 'company.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'company_db',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'NAME': config('NAME'),
+        'USER': config('USER'),
+        'PASSWORD':config('PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -130,10 +131,21 @@ STATIC_URL = 'static/'
 
 STATIC_URL = '/static/'  # URL to access static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static') 
+    os.path.join(BASE_DIR, 'static/') 
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com" 
+EMAIL_PORT = 587  
+EMAIL_USE_TLS = True                                  # Use TLS (for security)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")              # Your email
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")           # App password (not your regular password)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER        
