@@ -1,10 +1,13 @@
 from django.contrib import admin
-from app.models import GeneralInfo, Service, Testimonial, FrequentlyAskedQuestion
+from app.models import (GeneralInfo, Service, Testimonial, FrequentlyAskedQuestion, ContactFormLog, 
+Blog, Author)
 # Register your models here.
 admin.site.register(GeneralInfo)
 admin.site.register(Service)
 admin.site.register(FrequentlyAskedQuestion)
-
+admin.site.register(ContactFormLog)
+admin.site.register(Blog)
+admin.site.register(Author)
 
 
 @admin.register(Testimonial)

@@ -39,6 +39,17 @@
 </head>
 
 <body>
+    {% for message in messages %}
+      {% if message.tags == "error" %}
+        <h1 style="color: red;">Error : {{ message }}</h1>
+      {% else %}
+      <div class="alert alert-success" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        </button>
+      </div>
+      {% endif %}
+    {% endfor %}
 
     {% include "assets/header.html" %}
 

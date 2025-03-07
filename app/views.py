@@ -1,9 +1,14 @@
 from django.shortcuts import render, redirect
-from .models import GeneralInfo, Service, Testimonial, FrequentlyAskedQuestion
+from .models import (GeneralInfo, Service, Testimonial, FrequentlyAskedQuestion, 
+ContactFormLog, Blog, Author)
 # Create your views here.
 from django.db import connection
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.contrib import messages
+from django.utils import timezone
+
 
 def write_sql_que_to_file(file_path):
     with open(file_path, 'w') as file:
@@ -25,6 +30,14 @@ def index(request):
     
     ques = FrequentlyAskedQuestion.objects.all()
     
+    blogs = Blog.objects.all()
+    
+    # for i in blogs:
+    #     # print(i)
+    #     print(i.title)
+    #     print(i.author)
+    #     print(f" {i.author.last_name}")
+     
     file_path = 'sql_queries.log'
     write_sql_que_to_file(file_path)
     
@@ -39,6 +52,7 @@ def index(request):
         "services" : services,
         "testimonials" : testimonials,
         "ques" : ques,
+        "blogs" : blogs,
     }
     return render(request, "index.html", context)
     
@@ -52,14 +66,48 @@ def contact_form(request):
         subject = request.POST.get('subject')
         message = request.POST.get('message')
         
-        send_mail(
-            subject=subject, 
-            message=f"{name}- {message}",  
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[settings.EMAIL_HOST_USER],
-        )
+        context = {
+            "name" : name,
+            "email" : email,
+            "subject": subject,
+            "message":message
+        }
+        html_content = render_to_string('email.html', context)
         
+        is_success = False
+        is_error = False
+        error_msg = ""
+        try:
+            send_mail(
+                subject=subject, 
+                message=None,
+                html_message= html_content,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[settings.EMAIL_HOST_USER],
+            )
+        except Exception as e:
+            is_error = True
+            error_msg = str(e)
+            messages.error(request, "Could not Send Email...")
+            # print(f"email sending is failed...")
+        else:
+            is_error=True
+            messages.success(request, "Message Send Successfully")
+            
+        ContactFormLog.objects.create(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message,
+            action_time=timezone.now(),
+            is_success = is_success,
+            is_error=is_error,
+            error_msg = error_msg,
+            
+        )
+            # print("email send successfully....!")
     return redirect('index')
 
 
- 
+# def blog_detail(request, pk):
+    blog = Blog.ob/jects.get(id=pk)
