@@ -22,7 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('index', views.index, name='index'),
     path('contact', views.contact_form, name="contact_form"),
-    # path('blog-detail/<int:pk>/', views.blog_detail, name='blog-detail '),
+    path('blog-detail/<int:pk>/', views.blog_detail, name='blog-detail'),
+    path('blogs',views.blogs, name = 'blogs'),
     
     
 ]

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils import timezone
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 def write_sql_que_to_file(file_path):
@@ -30,7 +31,7 @@ def index(request):
     
     ques = FrequentlyAskedQuestion.objects.all()
     
-    blogs = Blog.objects.all()
+    blogs = Blog.objects.all().order_by("-created_at")[:3]
     
     # for i in blogs:
     #     # print(i)
@@ -109,5 +110,30 @@ def contact_form(request):
     return redirect('index')
 
 
-# def blog_detail(request, pk):
-    blog = Blog.ob/jects.get(id=pk)
+def blog_detail(request, pk):
+    blog = Blog.objects.get(id=pk)
+    blogs = Blog.objects.all().exclude(id=pk).order_by("-created_at")[:2]
+    
+    context = {
+        "blog" : blog,
+        "blogs" : blogs,
+        
+    }
+    return render(request, "blog_details.html", context)
+
+
+def blogs(request):
+    all_blogs = Blog.objects.all().order_by("-created_at")
+    paginator = Paginator(all_blogs, 1)
+    page = request.GET.get('page')
+    try:
+        blogs = paginator.page(page)
+    except PageNotAnInteger:
+        blogs= paginator.page(1)
+    except EmptyPage:
+        blogs = paginator.page(paginator.num_pages)
+        
+    context = {
+        "blogs" : blogs,
+    }
+    return render(request, "blogs.html", context)
